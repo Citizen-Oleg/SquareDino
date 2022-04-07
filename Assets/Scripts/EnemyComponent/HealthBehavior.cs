@@ -18,6 +18,11 @@ namespace EnemyComponent
 
         public void ApplyDamage(float damage)
         {
+            if (_enemy.CharacteristicsEnemy.IsDead)
+            {
+                return;
+            }
+            
             _enemy.CharacteristicsEnemy.CurrentHp -= damage;
             OnHealthChange?.Invoke();
 
