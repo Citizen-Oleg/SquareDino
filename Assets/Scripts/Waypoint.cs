@@ -27,6 +27,18 @@ public class Waypoint : MonoBehaviour
         }
     }
 
+    public bool CheckEveryoneDead()
+    {
+        var everyoneDead = _waypointEnemies.TrueForAll(enemy => enemy.CharacteristicsEnemy.IsDead);
+        if (everyoneDead && _nextWaypoint != null)
+        {
+            OnWaypointCleared?.Invoke(_nextWaypoint);
+            return true;
+        }
+
+        return false;
+    }
+
     private void EnemyClearCheck(Enemy enemy)
     {
         if (++_numberEnemyKilled != _waypointEnemies.Count)

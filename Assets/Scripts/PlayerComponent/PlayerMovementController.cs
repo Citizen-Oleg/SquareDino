@@ -47,18 +47,24 @@ namespace PlayerComponent
                 yield return null;
             }
 
-            StartCoroutine(RotateToPoint());
-            _player.PlayerAnimationController.SetRunAnimation(false);
             _currentWaypoint.OnWaypointCleared += MoveToWaypoint;
-            IsRun = false;
-
-            if (_currentWaypoint.IsFinish)
+            if (_currentWaypoint.CheckEveryoneDead())
             {
-                EventStreams.UserInterface.Publish(new RestartGameEvent());
+                yield break;
             }
+            
+            _player.PlayerAnimationController.SetRunAnimation(false);
+            StartCoroutine(RotateToPoint(() =>
+            {
+                IsRun = false;
+                if (_currentWaypoint.IsFinish)
+                {
+                    EventStreams.UserInterface.Publish(new RestartGameEvent());
+                }
+            }));
         }
 
-        private IEnumerator RotateToPoint()
+        private IEnumerator RotateToPoint(Action callBack)
         {
             var currentTime = 0f;
             var startRotation = transform.rotation;
@@ -72,6 +78,7 @@ namespace PlayerComponent
             }
 
             transform.rotation = finalRotation;
+            callBack?.Invoke();
         }
 
         private void MoveToWaypoint(StartGameEvent startGameEvent)
